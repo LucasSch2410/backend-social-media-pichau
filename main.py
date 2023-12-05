@@ -30,7 +30,7 @@ def main():
     # Put the image into template
     product_create(image, template_storie)
 
-    template_storie.save("data/output/output.png")
+    template_storie.save("data/output/file.png")
 
     sys.exit(0)
 
