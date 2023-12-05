@@ -4,15 +4,18 @@ from io import BytesIO
 
 import dropbox
 from dropbox.exceptions import AuthError
+from oauth.connection import authenticate_dropbox
+
 
 def main():
-    connection = dropbox_connect()
 
-    product = input("sku: ").upper().split(", ")
+    dbx = dropbox_connect()
+
+    product_name = input("sku: ").upper().split(", ")
 
     template_storie = Image.open('templates/template-storie.jpg')
-    dropbox_file = dropbox_download_file(product[len(product) - 1], connection)
 
+    dropbox_file = dropbox_download_file(product_name[len(product_name) - 1], dbx)
     if dropbox_file is not None:
         image = Image.open(dropbox_file)
     else:
@@ -20,7 +23,7 @@ def main():
         sys.exit(2)
 
     # Put the text into template
-    create_text(product, template_storie)
+    create_text(product_name, template_storie)
 
     # Put the image into template
     product_create(image, template_storie)
@@ -30,23 +33,19 @@ def main():
     sys.exit(0)
 
 
-
-
-
-
-
-
+# Production connection
 def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.BrHnAYYkYr54rZovRiH26x2E6JPDc4Iq59YncJha81pLJZLAl9yZLoQXQ83DzhoEbR8Nekw_SSsN4BRaxAC4HiFwYIdwKwdNWEiIzaDzyw8eLtt6EURPDOt_DrRfuO5eWpAQWYETP3I_DypL1lBF5wE')
+        dbx = dropbox.Dropbox('sl.BrKzlljoeempU55__nXdZwMLMRK3L2IDgDlal4mwM0rFLOnOl1a1bam7PneyrOiFrjBjsqFOxkTkC59cuScRAZ786kFp0QgX--zeoX4E7EqbDe5iYBXIl8-BuBKMhjwWquZsDkg-WxUScFTEcbSN0CM')
     except AuthError as e:
         print('Erro ao se conectar ao Dropbox com o token de acesso: ' + str(e))
         sys.exit(3)
     return dbx
 
 
+# Download the image from Dropbox
 def dropbox_download_file(sku, dropbox):
     """Download a file from Dropbox to the local machine."""
 
@@ -60,6 +59,7 @@ def dropbox_download_file(sku, dropbox):
     except Exception as e:
         print('Erro ao fazer o download da imagem no Dropbox: ' + str(e))
         sys.exit(1)
+
 
 # Resize the Image and put in the template
 def product_create(product, template):
@@ -86,31 +86,13 @@ def product_create(product, template):
         sys.exit(4)
 
 
-
-
-
-
-
 # Creates the red background in the price section
 def create_layout():
     return None
 
+
 # Creates the text in the image
 def create_text(text, template):
-    
-    d1 = ImageDraw.Draw(template)
-    titleSize = d1.textlength(text[0], font_size=50)
-    if titleSize > template.width:
-        text1 = text[0].split(" ").pop()
-        ' '.join(text1)
-        text2 = text.split(" ")
-
-        d1.multiline_text((28, 36), text1 + "\n" + text2[len(text2) - 1], fill=(255, 0, 0), font_size=50)
-    else:
-        d1.multiline_text((28, 36), text[0], fill=(255, 0, 0), font_size=50)
-
-
-    template.show()
     return True
 
 main()
