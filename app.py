@@ -95,4 +95,5 @@ def create_layout():
 def create_text(text, template):
     return True
 
+
 main()
