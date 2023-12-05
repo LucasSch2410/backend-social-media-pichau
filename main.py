@@ -1,26 +1,28 @@
 import sys
 from PIL import Image, ImageDraw
-from io import BytesIO
 
 import dropbox
 from dropbox.exceptions import AuthError
-from oauth.connection import authenticate_dropbox
+
+from app.oauth.connection import authenticate_dropbox
+from app.resource_handler import load_background, load_product_image, load_font
 
 
-def main():
-
+def main(): 
     dbx = dropbox_connect()
-
+    
     product_name = input("Nome do produto: ").upper().split(", ")
 
-    template_storie = Image.open('assets/templates/template-storie.jpg')
-
-    dropbox_file = dropbox_download_file(product_name[len(product_name) - 1], dbx)
+    # Import essential files
+    template_storie = load_background("data/input/templates/template-storie.jpg")
+    
+    dropbox_file = load_product_image(product_name[len(product_name) - 1], dbx)
     if dropbox_file is not None:
         image = Image.open(dropbox_file)
     else:
         print("Erro ao retornar a imagem.")
-        sys.exit(2)
+        sys.exit(1)
+
 
     # Put the text into template
     create_text(product_name, template_storie)
@@ -28,7 +30,7 @@ def main():
     # Put the image into template
     product_create(image, template_storie)
 
-    template_storie.save("output.png")
+    template_storie.save("data/output/output.png")
 
     sys.exit(0)
 
@@ -38,27 +40,11 @@ def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.BrKzlljoeempU55__nXdZwMLMRK3L2IDgDlal4mwM0rFLOnOl1a1bam7PneyrOiFrjBjsqFOxkTkC59cuScRAZ786kFp0QgX--zeoX4E7EqbDe5iYBXIl8-BuBKMhjwWquZsDkg-WxUScFTEcbSN0CM')
+        dbx = dropbox.Dropbox('sl.BrLjXJsXMIxiDiMiZ9Cz9YJ6K0TVquXhDooo3d6nt1YGi47VAN6wAV4GYrHfvBCgDhypl84ua5RRlSNm8p1stdCwo9oEmkGbENEJYFcMCR6RqGzdFipdwfF-9otmZoJ2sT5xJDlTGaCtd9QMBNKMrJ4')
     except AuthError as e:
         print('Erro ao se conectar ao Dropbox com o token de acesso: ' + str(e))
         sys.exit(3)
     return dbx
-
-
-# Download the image from Dropbox
-def dropbox_download_file(sku, dropbox):
-    """Download a file from Dropbox to the local machine."""
-
-    try:
-        metadata, response = dropbox.files_download(f"/automacao_midia/{sku}.png")
-        
-        # Get the binary content of the file
-        data = BytesIO(response.content)
-
-        return data
-    except Exception as e:
-        print('Erro ao fazer o download da imagem no Dropbox: ' + str(e))
-        sys.exit(1)
 
 
 # Resize the Image and put in the template
@@ -86,13 +72,15 @@ def product_create(product, template):
         sys.exit(4)
 
 
-# Creates the red background in the price section
+# TODO Creates the red background in the price section
 def create_layout():
     return None
 
 
-# Creates the text in the image
+# TODO Creates the text in the image
 def create_text(text, template):
+
+    
     return True
 
 
