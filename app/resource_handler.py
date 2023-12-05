@@ -30,8 +30,8 @@ def load_product_image(sku, dropbox):
 def load_font():
         """Import the BebasNeue Font"""
         try:
-            fnt = ImageFont.truetype("data/input/BebasNeue-Bold.ttf", 120)
-            return fnt
+            font = ImageFont.truetype("data/input/fonts/BebasNeue-Bold.ttf", 120)
+            return font
         except Exception as e:
-             print("Erro ao importar a fonte" + str(e))
+             print("Erro ao importar a fonte: " + str(e))
              sys.exit(1)
