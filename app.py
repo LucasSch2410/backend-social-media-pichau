@@ -11,9 +11,9 @@ def main():
 
     dbx = dropbox_connect()
 
-    product_name = input("sku: ").upper().split(", ")
+    product_name = input("Nome do produto: ").upper().split(", ")
 
-    template_storie = Image.open('templates/template-storie.jpg')
+    template_storie = Image.open('assets/templates/template-storie.jpg')
 
     dropbox_file = dropbox_download_file(product_name[len(product_name) - 1], dbx)
     if dropbox_file is not None:
