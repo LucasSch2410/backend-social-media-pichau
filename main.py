@@ -9,7 +9,7 @@ from app.resource_handler import load_background, load_product_image, load_font
 
 
 def main(): 
-    dbx = dropbox_connect()
+    dbx = authenticate_dropbox()
     
     product_name = input("Nome do produto: ").upper().split(", ")
     
