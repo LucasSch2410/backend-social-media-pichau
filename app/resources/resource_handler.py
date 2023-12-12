@@ -21,7 +21,13 @@ def load_product_image(sku, dropbox):
         # Get the binary content of the file
         data = BytesIO(response.content)
 
-        return data
+        if data is not None:
+            image = Image.open(data)
+        else:
+            print("Erro ao retornar a imagem.")
+            sys.exit(1)
+
+        return image
     except Exception as e:
         print('Erro ao fazer o download da imagem no Dropbox: ' + str(e))
         sys.exit(1)
