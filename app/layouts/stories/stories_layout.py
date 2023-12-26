@@ -1,5 +1,4 @@
 from app.resources.resource_handler import load_background, load_product_image, load_font
-from app.oauth.connection import authenticate_dropbox
 from PIL import Image, ImageDraw, ImageFont
 import sys
 
@@ -16,7 +15,7 @@ class InstagramLayout:
         Wrap the text if it's bigger than the template width.
         
         Args:
-            text: The full text separated by commas. (str)
+            text: The full text. (List[str])
             font: The font object. (Font)
             max_width: The maximum width that the text will can be. (Int)
         
@@ -26,11 +25,14 @@ class InstagramLayout:
         """
 
         lines = []
+
+        separated_text = ', '.join(text[:-1]) + ','
+
         # Return if the text width is smaller than max_width
-        if font.getlength(text) <= max_width:
-            lines.append(text) 
+        if font.getlength(separated_text) <= max_width:
+            lines.append(separated_text) 
         else:
-            words = text.split(' ')  
+            words = separated_text.split(' ')  
             i = 0
             while i < len(words):
                 line = ''         
@@ -38,13 +40,14 @@ class InstagramLayout:
                     line = line + words[i] + " "
                     i += 1
                 lines.append(line)  
-                # Stop if there more than three lines and removes the last two characters
+                # Stop if there more than three lines and and removes clipped features
                 if len(lines) > 2:
-                    if lines[-1][-2:] == ", ":
-                        lines[-1] = lines[-1][:-2]
+                    if lines[2][-1] != ',':
+                        temp = lines[2].split(', ')
+                        temp = ', '.join(temp[:-1])
+                        lines[2] = temp
                     break  
         return lines
-
     
     def create_text(self):
         """
@@ -61,8 +64,7 @@ class InstagramLayout:
 
         draw = ImageDraw.Draw(self.background)
 
-        full_text = ', '.join(self.product_name[:len(self.product_name)-1]) # Combine all text except the last element (SKU).
-        wraped_text = self.text_wrap(full_text, self.titleFont, self.background.width - 200) # Wrap text based on template width.
+        wraped_text = self.text_wrap(self.product_name, self.titleFont, self.background.width - 200) # Wrap text based on template width.
         multilines_text = '\n'.join(wraped_text) # Join wrapped lines with newline characters.
 
         draw.text((110,480), multilines_text, font=self.titleFont, fill=(255, 255, 255), # Draw text with white fill.
@@ -104,7 +106,18 @@ class InstagramLayout:
             print("Error when add the product image into background: ", e)
             sys.exit(4)
 
-        
+    def create_layout(self):
+        """Generates the complete Instagram layout."""
+        try:
+            self.create_text()  
+            self.product_create()  
+            return self.background  
+        except Exception as e:
+            print("Erro durante a criação do layout:", e)
+            return None  # Indicate failure
+
+    def __call__(self):
+        return self.create_layout()
 
 
     

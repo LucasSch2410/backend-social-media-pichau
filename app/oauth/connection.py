@@ -1,13 +1,12 @@
 import dropbox
 import sys
-from dropbox import DropboxOAuth2FlowNoRedirect
+from dropbox import DropboxOAuth2Flow
 from dropbox.exceptions import AuthError
 
 APP_KEY = "emm8mikk0bmdwbn"
-APP_SECRET = "ldxj4yfnixjfhdz"
 
 def authenticate_dropbox():
-    auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
+    auth_flow = DropboxOAuth2Flow(APP_KEY, )
 
     authorize_url = auth_flow.start()
     print("1. Go to: " + authorize_url)
