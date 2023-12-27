@@ -10,27 +10,27 @@ from app.layouts.stories.stories_layout import InstagramLayout
 
 app = Flask(__name__)
 
-@app.route('/media', methods=['POST'])
+@app.route('/instagram', methods=['POST'])
 def create_media():
 
-    dbx = dropbox_connect()
+    try:
+        dbx = dropbox_connect()
 
-    product = request.json["product"]
+        final_layout_image = InstagramLayout(request.json["product"], dbx)()
 
-    product_name = product.upper().split(", ")
-    
-    for i in range(len(product_name)):
-        product_name[i].replace(",", "")
+        if final_layout_image:
+            final_layout_image.save("data/output/file.png")  # Save the image if successful
+            return 'Success!'
+        else:
+            raise Exception("Error occurred during layout creation.")
+    except AuthError as e:
+        return jsonify({"error": f"Authentication error: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
-    final_layout_image = InstagramLayout(product_name, dbx)()
 
-    if final_layout_image:
-        final_layout_image.save("data/output/file.png")  # Save the image if successful
-        return 'Success!'
-    else:
-        return "Error occurred during layout creation."
 
-@app.route('/post', methods=['POST'])
+@app.route('/sheet', methods=['POST'])
 def scrap_sheet():
     return True
 
@@ -39,10 +39,9 @@ def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.BsdDhpjWYz9ieoXQsYYfhopRmKasZedYepKHNAY9Wel-CJhBRnmp5AB4qAukC_Wr3ZT-Gqc7aqkHFp7ON4-x-E_MCtJMKb-2gico1fApuoerMJ6pFAcEVMI4PdUgbHSGRhmXY_mI-PlZsCu2JTMH18Y')
+        dbx = dropbox.Dropbox('sl.BsiBbYjvNfKxKNcZkAODXkvsWG5XkrW9gU48H8khkiLd0diCs-80yoJTYkGy-6J7G0ulYP33isuZg3qRnYOMq0uwaU29XcjZzXPC1IUCznNmx_8SjOkqT3oYNVz9rEjvi5cTcwxRoHlQZqEEeqm1EvQ')
     except AuthError as e:
-        print('Erro ao se conectar ao Dropbox com o token de acesso: ' + str(e))
-        sys.exit(3)
+        raise Exception(f'Error connecting to Dropbox with access token: {str(e)}')
     return dbx
 
 app.run(port=5000, host='localhost', debug=True)

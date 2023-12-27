@@ -5,9 +5,9 @@ import sys
 class InstagramLayout:
 
     def __init__(self, product_name, dropbox):
-        self.product_name = product_name
+        self.product_name = product_name.upper().split(", ")
         self.background = load_background("data/input/templates/template-storie.jpg")
-        self.product = load_product_image(self.product_name[len(product_name) - 1], dropbox)
+        self.product = load_product_image(self.product_name[len(self.product_name) - 1], dropbox)
         self.titleFont = load_font()
     
     def text_wrap(self, text, font, max_width):
@@ -40,7 +40,7 @@ class InstagramLayout:
                     line = line + words[i] + " "
                     i += 1
                 lines.append(line)  
-                # Stop if there more than three lines and and removes clipped features
+                # Stop if there more than three lines and removes clipped features
                 if len(lines) > 2:
                     if lines[2][-1] != ',':
                         temp = lines[2].split(', ')
@@ -85,26 +85,22 @@ class InstagramLayout:
             text_height: The height of the text created. (int)
         """
 
-        try:
-            # Calculate the width and height of the non-transparent region
-            cropped_image = self.product.crop(self.product.getbbox())
-            
-            # Calculate the aspect ratio
-            aspect_ratio = cropped_image.width / cropped_image.height
+        # Calculate the width and height of the non-transparent region
+        cropped_image = self.product.crop(self.product.getbbox())
+        
+        # Calculate the aspect ratio
+        aspect_ratio = cropped_image.width / cropped_image.height
 
-            # Calculate the new height based on the template aspect ratio
-            new_width = self.background.width - 200
-            new_height = int(new_width / aspect_ratio)
+        # Calculate the new height based on the template aspect ratio
+        new_width = self.background.width - 200
+        new_height = int(new_width / aspect_ratio)
 
-            # Resize the product image with the new dimensions
-            resized_image = cropped_image.resize((new_width, new_height))
+        # Resize the product image with the new dimensions
+        resized_image = cropped_image.resize((new_width, new_height))
 
-            position = (100, 480 + self.text_height) 
-            self.background.paste(resized_image, position, mask=resized_image) 
-            return True
-        except Exception as e:
-            print("Error when add the product image into background: ", e)
-            sys.exit(4)
+        position = (100, 480 + self.text_height) 
+        self.background.paste(resized_image, position, mask=resized_image) 
+        return True
 
     def create_layout(self):
         """Generates the complete Instagram layout."""
@@ -113,8 +109,7 @@ class InstagramLayout:
             self.product_create()  
             return self.background  
         except Exception as e:
-            print("Erro durante a criação do layout:", e)
-            return None  # Indicate failure
+            raise Exception(f'Error occurred during layout creation: {str(e)}')
 
     def __call__(self):
         return self.create_layout()

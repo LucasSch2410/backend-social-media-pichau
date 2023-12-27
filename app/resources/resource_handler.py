@@ -8,8 +8,7 @@ def load_background(path):
         template = Image.open(path)
         return template
     except Exception as e:
-        print("Erro ao importar a imagem de template: " + str(e))
-        sys.exit(1)
+        raise Exception(f'Error importing template image: {str(e)}')
 
 # Download the image from Dropbox
 def load_product_image(sku, dropbox):
@@ -24,13 +23,10 @@ def load_product_image(sku, dropbox):
         if data is not None:
             image = Image.open(data)
         else:
-            print("Erro ao retornar a imagem.")
-            sys.exit(1)
-
+            raise Exception("Image is null.")
         return image
     except Exception as e:
-        print('Erro ao fazer o download da imagem no Dropbox: ' + str(e))
-        sys.exit(1)
+        raise Exception(f'Error when downloading image from dropbox: {str(e)}')
 
 
 def load_font():
@@ -39,5 +35,4 @@ def load_font():
             font = ImageFont.truetype("data/input/fonts/BebasNeue-Bold.ttf", 120)
             return font
         except Exception as e:
-             print("Erro ao importar a fonte: " + str(e))
-             sys.exit(1)
+            raise Exception(f'Error importing font: {str(e)}')
