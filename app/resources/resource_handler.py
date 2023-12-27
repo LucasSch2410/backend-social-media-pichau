@@ -32,7 +32,8 @@ def load_product_image(sku, dropbox):
 def load_font():
         """Import the BebasNeue Font"""
         try:
-            font = ImageFont.truetype("data/input/fonts/BebasNeue-Bold.ttf", 80)
-            return font
+            title = ImageFont.truetype("data/input/fonts/BebasNeue-Bold.ttf", 90)
+            feature = ImageFont.truetype("data/input/fonts/BebasNeue-Bold.ttf", 50)
+            return title, feature
         except Exception as e:
             raise Exception(f'Error importing font: {str(e)}')
