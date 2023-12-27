@@ -39,7 +39,7 @@ def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.BsiBbYjvNfKxKNcZkAODXkvsWG5XkrW9gU48H8khkiLd0diCs-80yoJTYkGy-6J7G0ulYP33isuZg3qRnYOMq0uwaU29XcjZzXPC1IUCznNmx_8SjOkqT3oYNVz9rEjvi5cTcwxRoHlQZqEEeqm1EvQ')
+        dbx = dropbox.Dropbox('sl.Bsi3zDT5sWq6xiYzSSojCKm8SfrysuzYPHfLvfbuCodL5KtLGZIZI6dH6BICl_7JurmCiX0COpZx-wuayWyQqWUhbo08mtGEqOacO8XWa0XxzVWXeBemJ7VmlEBWGJk-UeDGmrJdRN3czfhTmoXGD6c')
     except AuthError as e:
         raise Exception(f'Error connecting to Dropbox with access token: {str(e)}')
     return dbx

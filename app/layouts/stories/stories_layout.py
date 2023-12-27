@@ -68,7 +68,7 @@ class InstagramLayout:
         multilines_text = '\n'.join(wraped_text) # Join wrapped lines with newline characters.
 
         draw.text((110,480), multilines_text, font=self.titleFont, fill=(255, 255, 255), # Draw text with white fill.
-                stroke_width=10, stroke_fill=(0, 0, 0)) # Add black stroke around text for better visibility.
+                stroke_width=6, stroke_fill=(0, 0, 0)) # Add black stroke around text for better visibility.
         
         # Calculate text height based on font size and number of lines.
         text_height = self.titleFont.getbbox(multilines_text)[3] * len(wraped_text) + (25 * len(wraped_text))
