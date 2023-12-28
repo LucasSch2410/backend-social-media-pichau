@@ -59,14 +59,14 @@ class InstagramLayout:
 
         draw = ImageDraw.Draw(self.background)
 
-        wraped_title = self.text_wrap(self.product_name[0], self.titleFont, self.background.width - 200, True) # Wrap title based on template width.
+        wrapped_title = self.text_wrap(self.product_name[0], self.titleFont, self.background.width - 200, True) # Wrap title based on template width.
         wrapped_features = self.text_wrap(', '.join(self.product_name[1:-1]) + ',', self.featureFont, self.background.width - 200) # Wrap features based on template width.
 
-        draw.text((110,480), '\n'.join(wraped_title), font=self.titleFont, fill=(255, 255, 255), # Draw text with white fill.
+        draw.text((110,480), '\n'.join(wrapped_title), font=self.titleFont, fill=(255, 255, 255), # Draw text with white fill.
                 stroke_width=6, stroke_fill=(0, 0, 0)) # Add black stroke around text for better visibility.
         
         # Calculate text height based on font size and number of lines.
-        text_height = self.titleFont.getbbox('\n'.join(wraped_title))[3] * len(wraped_title) + (25 * len(wraped_title))
+        text_height = self.titleFont.getbbox('\n'.join(wrapped_title))[3] * len(wrapped_title) + (25 * len(wrapped_title))
 
         draw.text((110,480 + text_height), '\n'.join(wrapped_features), font=self.featureFont, fill=(255, 255, 255), # Draw text with white fill.
                 stroke_width=6, stroke_fill=(0, 0, 0)) # Add black stroke around text for better visibility.

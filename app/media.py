@@ -1,8 +1,9 @@
-import sys
+import csv, requests
+import dropbox
+
 from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, jsonify, request
-
-import dropbox
+from bs4 import BeautifulSoup
 from dropbox.exceptions import AuthError
 
 # from app.oauth.connection import authenticate_dropbox
@@ -12,7 +13,6 @@ app = Flask(__name__)
 
 @app.route('/instagram', methods=['POST'])
 def create_media():
-
     try:
         dbx = dropbox_connect()
 
@@ -32,14 +32,30 @@ def create_media():
 
 @app.route('/sheet', methods=['POST'])
 def scrap_sheet():
-    return True
+    """
+    Scrap the HTML of the Google Sheet in the URL from the request
+    """
+
+    html = requests.get(request.json["sheet_url"]).text
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("tbody")
+    products = []
+
+    # Iterate across product lines
+    for line in table:
+        index = int(line.find('th').get_text())
+        if index > 1:
+            product = line.find('td').get_text()
+            if product != "":
+                products.append(product)
+    return jsonify({"products": products})
 
 # Production connection 
 def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.Bsi3zDT5sWq6xiYzSSojCKm8SfrysuzYPHfLvfbuCodL5KtLGZIZI6dH6BICl_7JurmCiX0COpZx-wuayWyQqWUhbo08mtGEqOacO8XWa0XxzVWXeBemJ7VmlEBWGJk-UeDGmrJdRN3czfhTmoXGD6c')
+        dbx = dropbox.Dropbox('sl.Bsl4y581fMelsbwTc4XMn56KesbVjWX51-LyZ0DtHkPmtF54DkmWcFhT7oQPMyKjr97typUSgdw7SQg5aImwYkCZg0icWNZChh_-n0o7ysDW2Pz1w0RI9WyDobvMSF7lv-Xga25IfcJldr0qBe1jEZ8')
     except AuthError as e:
         raise Exception(f'Error connecting to Dropbox with access token: {str(e)}')
     return dbx
