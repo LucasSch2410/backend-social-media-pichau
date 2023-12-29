@@ -2,7 +2,7 @@ import csv, requests
 import dropbox
 
 from PIL import Image, ImageDraw, ImageFont
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 from bs4 import BeautifulSoup
 from dropbox.exceptions import AuthError
 
@@ -10,6 +10,7 @@ from dropbox.exceptions import AuthError
 from app.layouts.stories.stories_layout import InstagramLayout
 
 app = Flask(__name__)
+
 
 @app.route('/instagram', methods=['POST'])
 def create_media():
@@ -27,7 +28,6 @@ def create_media():
         return jsonify({"error": f"Authentication error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
-
 
 
 @app.route('/sheet', methods=['POST'])
@@ -49,6 +49,30 @@ def scrap_sheet():
             if product != "":
                 products.append(product)
     return jsonify({"products": products})
+
+
+# Auth2 redirect
+@app.route('/auth2', methods=['GET'])
+def auth2():
+    authorization_code = str(request.args.get('code'))
+    token_url = "https://api.dropboxapi.com/oauth2/token"
+    params = {
+        "code": authorization_code,
+        "grant_type": 'authorization_code',
+        "redirect_uri": 'http://localhost:5000/auth2',
+        "client_id": 'emm8mikk0bmdwbn',
+        "client_secret": 'ldxj4yfnixjfhdz'
+    }
+
+    r = requests.post(token_url, data=params)
+
+    if r.status_code != 200:
+        return f'Error {r}'
+    
+    access_token = r.json()['access_token']
+    
+    return redirect(f'http://localhost:5173?access_token={access_token}')
+
 
 # Production connection 
 def dropbox_connect():
