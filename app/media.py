@@ -1,10 +1,7 @@
-import csv, requests
-import dropbox
-import base64
-from io import BytesIO
+import requests, dropbox, os, zipfile
 
-from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, jsonify, request, redirect, send_file
+from flask_cors import CORS
 from bs4 import BeautifulSoup
 from dropbox.exceptions import AuthError
 
@@ -12,31 +9,37 @@ from dropbox.exceptions import AuthError
 from app.layouts.stories.stories_layout import InstagramLayout
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/instagram', methods=['GET'])
+def download_images():
+    try:
+        with zipfile.ZipFile('data/output/files.zip', 'w') as zip_file:
+            files = os.listdir('./data/output/temp')
+
+            for file in files:
+                zip_file.write(os.path.join('data/output/temp', file))
+        return send_file('../data/output/files.zip')
+    except Exception as e:
+        return str(e)
+
+@app.route('/instagram', methods=['POST'])
 def create_media():
     try:
-        dbx = dropbox_connect()
+        dbx = dropbox_connect(request.json['access_token'])
 
-        final_layout_image = InstagramLayout(request.args["product"], dbx)()
+        final_layout_image = InstagramLayout(request.json["product"], dbx)()
 
         if final_layout_image:
-            final_layout_image.save("data/output/file.png")  # Save the image if successful
-            with open("data/output/file.png", 'rb') as f:
-                image_base64 = base64.b64encode(f.read())
-                image_base64_str = image_base64.decode('utf-8')
-            response = jsonify(image_base64_str)
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
-
+            final_layout_image.save(f"data/output/temp/{request.json['product'].split(', ')[-1]}.png")  # Save the image if successful
+            return 'Success'
         else:
             raise Exception("Error occurred during layout creation.")
     except AuthError as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
-
+    
 
 @app.route('/sheet', methods=['GET'])
 def scrap_sheet():
@@ -90,11 +93,11 @@ def auth2():
 
 
 # Production connection 
-def dropbox_connect():
+def dropbox_connect(access_token):
     """Create a connection to Dropbox."""
 
     try:
-        dbx = dropbox.Dropbox('sl.BsxYynhTTiphy9usSzmW0gEhcehSH1Hz0gir5yl5ZIa4qwDp_ahg35OjSa5rKcCRJ1_N0TbKR1OMujy3Bu_OnINFpgisznzOS78FA8NQdvVyEyl-Wg10n2gx2prlgUGzn0ahqPqPTQ68Xi4OXyZbxwc')
+        dbx = dropbox.Dropbox(access_token)
     except AuthError as e:
         raise Exception(f'Error connecting to Dropbox with access token: {str(e)}')
     return dbx
